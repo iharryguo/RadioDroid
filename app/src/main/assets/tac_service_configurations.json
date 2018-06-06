@@ -1,0 +1,30 @@
+{
+    "version": "1.0.0",
+    "warning": "请不要修改这个文件中的内容",
+    "project": {
+        "projectId": 102096
+    },
+    "application": {
+        "appId": 102032,
+        "packageId": "net.programmierecke.radiodroid2"
+    },
+    "services": {
+        "analytics": {
+            "appKey": "Aqcloud102032"
+        },
+        "messaging": {
+            "appId": "2100295305",
+            "appKey": "AYHB3A3516ST"
+        },
+        "crash": {
+            "appId": "f5eb27f1bd"
+        },
+        "payment": {
+            "offerId": "TC102032"
+        },
+        "storage": {
+            "bucket": "tac-pj-id-harryguo1-st-1251963496",
+            "region": "ap-chengdu"
+        }
+    }
+}

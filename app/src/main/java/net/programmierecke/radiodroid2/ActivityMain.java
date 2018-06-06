@@ -314,7 +314,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     protected void onPause() {
-
+        // TACCrashSimulator.testJavaCrash();
         SharedPreferences.Editor ed = sharedPref.edit();
         ed.putInt("last_selectedMenuItem", selectedMenuItem);
         ed.apply();
