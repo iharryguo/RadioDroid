@@ -36,7 +36,7 @@ public class FragmentStations extends FragmentBase {
         historyManager.add(theStation);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        final Boolean autoFavorite = sharedPref.getBoolean("auto_favorite", true);
+        final Boolean autoFavorite = sharedPref.getBoolean("auto_favorite", false);
         if (autoFavorite && !favouriteManager.has(theStation.ID)) {
             favouriteManager.add(theStation);
             Toast toast = Toast.makeText(context, context.getString(R.string.notify_autostarred), Toast.LENGTH_SHORT);

@@ -33,6 +33,7 @@ public class FragmentPlayer extends Fragment {
 	private Thread t;
 	private RelativeLayout layoutPlaying;
 	private RelativeLayout layoutRecording;
+	private LinearLayout layoutRadioName;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,36 +96,38 @@ public class FragmentPlayer extends Fragment {
 		layoutPlaying = (RelativeLayout) getActivity().findViewById(R.id.RelativeLayout1);
         layoutRecording = (RelativeLayout) getActivity().findViewById(R.id.RelativeLayout2);
 		imageViewIcon = (ImageView) getActivity().findViewById(R.id.playerRadioImage);
+		layoutRadioName = (LinearLayout) getActivity().findViewById(R.id.linear_radio_name);
 
 		buttonPause = (ImageButton) getActivity().findViewById(R.id.buttonPause);
-		if (buttonPause != null){
-			buttonPause.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (PlayerServiceUtil.isPlaying() || MPDClient.isPlaying) {
-						buttonPause.setImageResource(R.drawable.ic_play_circle);
-						buttonPause.setContentDescription(getResources().getString(R.string.detail_play));
-						if (PlayerServiceUtil.isRecording()) {
-							buttonRecord.setImageResource(R.drawable.ic_start_recording);
-							buttonRecord.setContentDescription(getResources().getString(R.string.image_button_record));
-							String recordingInfo = getResources().getString(R.string.player_info_recorded_to, PlayerServiceUtil.getCurrentRecordFileName());
-							textViewRecordingInfo.setText(recordingInfo);
-							PlayerServiceUtil.stopRecording();
-							layoutPlaying.setVisibility(View.GONE);
-						}
-						if(PlayerServiceUtil.isPlaying())
-							PlayerServiceUtil.stop();
-						// Don't stop MPD playback when a user is listening in the app
-						else if(MPDClient.isPlaying)
-							MPDClient.Stop(getContext());
-					} else {
-						buttonPause.setImageResource(R.drawable.ic_pause_circle);
-	buttonPause.setContentDescription(getResources().getString(R.string.detail_pause));
-						SetInfoFromHistory(true);
+		View.OnClickListener clickListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (PlayerServiceUtil.isPlaying() || MPDClient.isPlaying) {
+					buttonPause.setImageResource(R.drawable.ic_play_circle);
+					buttonPause.setContentDescription(getResources().getString(R.string.detail_play));
+					if (PlayerServiceUtil.isRecording()) {
+						buttonRecord.setImageResource(R.drawable.ic_start_recording);
+						buttonRecord.setContentDescription(getResources().getString(R.string.image_button_record));
+						String recordingInfo = getResources().getString(R.string.player_info_recorded_to, PlayerServiceUtil.getCurrentRecordFileName());
+						textViewRecordingInfo.setText(recordingInfo);
+						PlayerServiceUtil.stopRecording();
+						layoutPlaying.setVisibility(View.GONE);
 					}
+					if(PlayerServiceUtil.isPlaying())
+						PlayerServiceUtil.stop();
+						// Don't stop MPD playback when a user is listening in the app
+					else if(MPDClient.isPlaying)
+						MPDClient.Stop(getContext());
+				} else {
+					buttonPause.setImageResource(R.drawable.ic_pause_circle);
+					buttonPause.setContentDescription(getResources().getString(R.string.detail_pause));
+					SetInfoFromHistory(true);
 				}
-			});
-		}
+			}
+		};
+		buttonPause.setOnClickListener(clickListener);
+		textViewTransferredbytes.setOnClickListener(clickListener);
+
 
 		buttonRecord = (ImageButton) getActivity().findViewById(R.id.buttonRecord);
 		if (buttonRecord != null){
@@ -178,11 +181,13 @@ public class FragmentPlayer extends Fragment {
             public void onClick(View v) {
                 int currentVisibility = layoutPlaying.getVisibility();
                 layoutPlaying.setVisibility(currentVisibility == View.GONE ? View.VISIBLE : View.GONE);
+	            layoutRecording.setVisibility(currentVisibility == View.GONE ? View.GONE : View.VISIBLE);
             }
         };
 
-        layoutPlaying.setOnClickListener(onClickListener);
+		layoutRadioName.setOnClickListener(onClickListener);
         layoutRecording.setOnClickListener(onClickListener);
+		layoutRecording.setVisibility(View.GONE);
 	}
 
 	private void SetInfoFromHistory(boolean startPlaying) {

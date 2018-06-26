@@ -274,7 +274,23 @@ public class ExoPlayerWrapper implements PlayerWrapper, IcyDataSource.IcyDataSou
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            // Do nothing
+            if (playWhenReady)
+                stateListener.onStateChanged(RadioPlayer.PlayState.Playing);
+            else
+            {
+                switch (playbackState)
+                {
+                    default:
+                        stateListener.onStateChanged(RadioPlayer.PlayState.Idle);
+                        break;
+                    case Player.STATE_READY:
+                        stateListener.onStateChanged(RadioPlayer.PlayState.PrePlaying);
+                        break;
+                    case Player.STATE_ENDED:
+                        stateListener.onStateChanged(RadioPlayer.PlayState.Paused);
+                        break;
+                }
+            }
         }
 
         @Override

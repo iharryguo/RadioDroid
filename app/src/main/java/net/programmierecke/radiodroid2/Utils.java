@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 import net.programmierecke.radiodroid2.data.DataRadioStation;
 
 import net.programmierecke.radiodroid2.data.MPDServer;
+import net.programmierecke.radiodroid2.utils.ACache;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -46,6 +49,7 @@ import java.util.Map;
 
 public class Utils {
 	private static int loadIcons = -1;
+	private static ACache sACache;
 
 	public static String getCacheFile(Context ctx, String theURI) {
 		StringBuilder chaine = new StringBuilder("");
@@ -156,18 +160,77 @@ public class Utils {
 		return null;
 	}
 
-	public static String getRealStationLink(Context ctx, String stationId){
+	// ASimpleCache模块
+	private static ACache getACache(Context ctx)
+	{
+		if (sACache == null)
+		{
+			synchronized (Utils.class)
+			{
+				if (sACache == null)
+				{
+					ACache tempVar = ACache.get(ctx);
+					sACache = tempVar;
+				}
+			}
+		}
+		return sACache;
+	}
+
+	// 从ACache缓存读电台url
+	private static String getStationUrlFromCache(Context ctx, String stationId)
+	{
+		return getACache(ctx).getAsString("stn_url_" + stationId);
+	}
+
+	// 缓存电台url到ACache
+	private static void setStationUrlToCache(Context ctx, String stationId, String url)
+	{
+		getACache(ctx).put("stn_url_" + stationId, url, ACache.TIME_DAY * 20);
+	}
+
+	public static String getRealStationUrlFromNet(final Context ctx, final String stationId){
 		String result = Utils.downloadFeed(ctx, RadioBrowserServerManager.getWebserviceEndpoint(ctx, "v2/json/url/" + stationId), true, null);
 		if (result != null) {
 			JSONObject jsonObj;
 			try {
 				jsonObj = new JSONObject(result);
-				return jsonObj.getString("url");
+				result = jsonObj.getString("url");
 			} catch (Exception e) {
 				Log.e("UTIL", "getRealStationLink() " + e);
+				result = null;
 			}
 		}
-		return null;
+		return result;
+	}
+
+	public static String getRealStationLink(final Context ctx, final String stationId){
+		String result = null;
+		if (!TextUtils.isEmpty(stationId))
+		{
+			result = getStationUrlFromCache(ctx, stationId);
+			if (TextUtils.isEmpty(result))
+			{
+				result = getRealStationUrlFromNet(ctx, stationId);
+				if (!TextUtils.isEmpty(result))
+					setStationUrlToCache(ctx, stationId, result);
+			}
+			else // 去网上检查，当前url是否和网上最新的相同。不同则更新缓存
+			{
+				final String cacheUrl = result;
+				new AsyncTask<Void, Void, String>() {
+					@Override
+					protected String doInBackground(Void... params) {
+						String result = getRealStationUrlFromNet(ctx, stationId);
+						// 更新缓存
+						if (!TextUtils.isEmpty(result) && !result.equalsIgnoreCase(cacheUrl))
+							setStationUrlToCache(ctx, stationId, result);
+						return result;
+					}
+				}.execute();
+			}
+		}
+		return result;
 	}
 
 	public static DataRadioStation getStationByUuid(Context ctx, String stationUuid){
@@ -379,7 +442,7 @@ public class Utils {
 
     public static boolean bottomNavigationEnabled(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getBoolean("bottom_navigation", true);
+        return sharedPref.getBoolean("bottom_navigation", false);
     }
 
     public static String formatStringWithNamedArgs(String format, Map<String, String> args) {
