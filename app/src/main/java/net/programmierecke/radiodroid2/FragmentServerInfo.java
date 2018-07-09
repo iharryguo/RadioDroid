@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.programmierecke.radiodroid2.adapters.ItemAdapterStatistics;
+import net.programmierecke.radiodroid2.constant.ConstCommon;
 import net.programmierecke.radiodroid2.data.DataStatistics;
 import net.programmierecke.radiodroid2.interfaces.IFragmentRefreshable;
 
@@ -37,7 +38,7 @@ public class FragmentServerInfo extends Fragment implements IFragmentRefreshable
     }
 
     void Download(final boolean forceUpdate){
-        getContext().sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+        getContext().sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -51,7 +52,7 @@ public class FragmentServerInfo extends Fragment implements IFragmentRefreshable
             @Override
             protected void onPostExecute(String result) {
                 if(getContext() != null)
-                    getContext().sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+                    getContext().sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
                 if (result != null) {
                     itemAdapterStatistics.clear();
                     DataStatistics[] items = DataStatistics.DecodeJson(result);

@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import net.programmierecke.radiodroid2.constant.ConstCommon;
 import net.programmierecke.radiodroid2.data.DataRadioStation;
 
 public class ActivityRadioStationDetail extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
@@ -47,7 +48,7 @@ public class ActivityRadioStationDetail extends AppCompatActivity implements Tim
 
 		UpdateMenu();
 
-		getApplicationContext().sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+		getApplicationContext().sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
 		new AsyncTask<Void, Void, String>() {
 			@Override
 			protected String doInBackground(Void... params) {
@@ -64,7 +65,7 @@ public class ActivityRadioStationDetail extends AppCompatActivity implements Tim
 						}
 					}
 				}
-				getApplicationContext().sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+				getApplicationContext().sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
 				super.onPostExecute(result);
 			}
 

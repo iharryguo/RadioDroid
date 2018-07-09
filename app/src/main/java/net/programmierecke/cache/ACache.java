@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.programmierecke.radiodroid2.utils;
+package net.programmierecke.cache;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

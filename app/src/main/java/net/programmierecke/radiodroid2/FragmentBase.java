@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.programmierecke.radiodroid2.constant.ConstCommon;
+
 import java.util.HashMap;
 
 public class FragmentBase extends Fragment {
@@ -75,7 +77,7 @@ public class FragmentBase extends Fragment {
             String cache = Utils.getCacheFile(getActivity(), url);
             if (cache == null || forceUpdate) {
                 if (getContext() != null && displayProgress) {
-                    getContext().sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+                    getContext().sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
                 }
                 new AsyncTask<Void, Void, String>() {
                     @Override
@@ -91,7 +93,7 @@ public class FragmentBase extends Fragment {
                     protected void onPostExecute(String result) {
                         DownloadFinished();
                         if(getContext() != null)
-                            getContext().sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+                            getContext().sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
                         if (BuildConfig.DEBUG) {
                             Log.d(TAG, "Download url finished:" + url);
                         }

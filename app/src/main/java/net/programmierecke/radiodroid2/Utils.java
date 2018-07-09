@@ -24,10 +24,12 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import net.programmierecke.radiodroid2.constant.ConstCommon;
 import net.programmierecke.radiodroid2.data.DataRadioStation;
 
 import net.programmierecke.radiodroid2.data.MPDServer;
-import net.programmierecke.radiodroid2.utils.ACache;
+import net.programmierecke.cache.ACache;
 
 import org.json.JSONObject;
 
@@ -288,7 +290,7 @@ public class Utils {
 	}
 
 	private static void playInternal(final DataRadioStation station, final Context context, final boolean external) {
-        context.sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+        context.sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
 		new AsyncTask<Void, Void, String>() {
 			@Override
 			protected String doInBackground(Void... params) {
@@ -297,7 +299,7 @@ public class Utils {
 
 			@Override
 			protected void onPostExecute(String result) {
-                context.sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+                context.sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
 
 				if (result != null) {
 					boolean externalActive = false;

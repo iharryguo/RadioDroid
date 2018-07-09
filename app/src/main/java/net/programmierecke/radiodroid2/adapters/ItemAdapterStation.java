@@ -33,6 +33,7 @@ import android.view.ViewStub;
 import android.widget.*;
 
 import net.programmierecke.radiodroid2.*;
+import net.programmierecke.radiodroid2.constant.ConstCommon;
 import net.programmierecke.radiodroid2.data.DataRadioStation;
 import net.programmierecke.radiodroid2.interfaces.IAdapterRefreshable;
 import net.programmierecke.radiodroid2.utils.RecyclerItemSwipeHelper;
@@ -77,7 +78,7 @@ public class ItemAdapterStation
         @Override
         public void onTagSelected(String tag) {
             Intent i = new Intent(getContext(), ActivityMain.class);
-            i.putExtra(ActivityMain.EXTRA_SEARCH_TAG, tag);
+            i.putExtra(ConstCommon.EXTRA_SEARCH_TAG, tag);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(i);
@@ -437,7 +438,7 @@ public class ItemAdapterStation
     }
 
     private void retrieveAndCopyStreamUrlToClipboard(final DataRadioStation station) {
-        getContext().sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+        getContext().sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -447,7 +448,7 @@ public class ItemAdapterStation
             @Override
             protected void onPostExecute(String result) {
                 if(getContext() != null)
-                    getContext().sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+                    getContext().sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
 
                 if (result != null) {
                     ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -516,7 +517,7 @@ public class ItemAdapterStation
     }
 
     private void share(final DataRadioStation station) {
-        getContext().sendBroadcast(new Intent(ActivityMain.ACTION_SHOW_LOADING));
+        getContext().sendBroadcast(new Intent(ConstCommon.ACTION_SHOW_LOADING));
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -526,7 +527,7 @@ public class ItemAdapterStation
             @Override
             protected void onPostExecute(String result) {
                 if(getContext() != null)
-                    getContext().sendBroadcast(new Intent(ActivityMain.ACTION_HIDE_LOADING));
+                    getContext().sendBroadcast(new Intent(ConstCommon.ACTION_HIDE_LOADING));
 
                 if (result != null) {
                     Intent share = new Intent(Intent.ACTION_VIEW);
