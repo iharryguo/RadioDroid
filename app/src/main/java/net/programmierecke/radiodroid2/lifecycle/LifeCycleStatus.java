@@ -5,5 +5,6 @@ package net.programmierecke.radiodroid2.lifecycle;
  */
 
 public class LifeCycleStatus {
+	public static boolean isInited = false;
 	public static boolean isSplashShowing = false;
 }

@@ -1,6 +1,5 @@
 package net.programmierecke.radiodroid2.lifecycle;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -77,7 +75,7 @@ import java.util.List;
 public class LifeCyclePresenter implements ILifeCyclePresenter {
 	private static final String TAG = "LifeCyclePresenter";
 	private ActivityMain mActivity;
-	private boolean mMainPageInited = false;
+	private boolean mViewVariablesInited = false;
 
 	private SearchView mSearchView;
 	DrawerLayout mDrawerLayout;
@@ -104,14 +102,22 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		// 先展示splash，同时初始化主页面，主页面初始化好了之后，再显示主页面，避免长时间白屏
-		showSplash();
-		ThreadPool.getInstance().uiHandler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				showMainPage(savedInstanceState);
-			}
-		}, 2000);
+		if (LifeCycleStatus.isInited)
+		{
+			showMainPage(savedInstanceState);
+		}
+		else
+		{
+			LifeCycleStatus.isInited = true;
+			// 先展示splash，同时初始化主页面，主页面初始化好了之后，再显示主页面，避免长时间白屏
+			showSplash();
+			ThreadPool.getInstance().uiHandler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					showMainPage(savedInstanceState);
+				}
+			}, 300);
+		}
 		CastHandler.onCreate(mActivity);
 	}
 
@@ -159,6 +165,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 		mDrawerLayout = mActivity.findViewById(R.id.drawerLayout);
 		mNavigationView = mActivity.findViewById(R.id.my_navigation_view);
 		mBottomNavigationView = mActivity.findViewById(R.id.bottom_navigation);
+		mViewVariablesInited = true;
 
 		if (Utils.bottomNavigationEnabled(mActivity)) {
 			mBottomNavigationView.setOnNavigationItemSelectedListener(mActivity);
@@ -180,7 +187,6 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 		FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 		fragmentTransaction.replace(R.id.playerView, f).commit();
 		setupStartUpFragment();
-		mMainPageInited = true;
 
 		LifeCycleStatus.isSplashShowing = false;
 	}
@@ -197,7 +203,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public boolean onNavigationItemSelected(MenuItem menuItem) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return false;
 		// If menuItem == null method was executed manually
 		if (menuItem != null)
@@ -245,7 +251,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public boolean onBackPressed() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return false;
 		int backStackCount = mFragmentManager.getBackStackEntryCount();
 		FragmentManager.BackStackEntry backStackEntry;
@@ -265,7 +271,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 			// I'm giving 3 seconds on making a choice
 			if (lastExitTry != null && new Date().getTime() < lastExitTry.getTime() + 3 * 1000) {
 				PlayerServiceUtil.shutdownService();
-				// mActivity.finish();
+				mActivity.finish();
 			} else {
 				Toast.makeText(mActivity, R.string.alert_press_back_to_exit, Toast.LENGTH_SHORT).show();
 				lastExitTry = new Date();
@@ -284,7 +290,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 			mActivity.invalidateOptionsMenu();
 
 		} else {
-			// mActivity.finish();
+			mActivity.finish();
 			return true;
 		}
 		return false;
@@ -311,7 +317,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		if (BuildConfig.DEBUG) {
 			Log.d(TAG, "on request permissions result:" + requestCode);
@@ -344,7 +350,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public void onPause() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		// TACCrashSimulator.testJavaCrash();
 		SharedPreferences.Editor ed = sharedPref.edit();
@@ -485,7 +491,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem menuItem) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return false;
 		switch (menuItem.getItemId()) {
 			case android.R.id.home:
@@ -577,7 +583,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public boolean onQueryTextSubmit(String query) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return false;
 		String queryEncoded;
 		try {
@@ -627,7 +633,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public final Toolbar getToolbar() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return null;
 		return mActivity.findViewById(R.id.my_awesome_toolbar);
 	}
@@ -668,7 +674,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 	}
 
 	private void selectMenuItem(int itemId) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		MenuItem item;
 		if (Utils.bottomNavigationEnabled(mActivity))
@@ -685,7 +691,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 	}
 
 	private void checkMenuItems() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		if (mBottomNavigationView.getMenu().findItem(selectedMenuItem) != null)
 			mBottomNavigationView.getMenu().findItem(selectedMenuItem).setChecked(true);
@@ -696,7 +702,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	@Override
 	public void Search(String query) {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		Fragment currentFragment = mFragmentManager.getFragments().get(mFragmentManager.getFragments().size() - 1);
 		if (currentFragment instanceof FragmentTabs) {
@@ -737,19 +743,19 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 
 	// Loading listener
 	private void showLoadingIcon() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		mActivity.findViewById(R.id.progressBarLoading).setVisibility(View.VISIBLE);
 	}
 
 	private void hideLoadingIcon() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		mActivity.findViewById(R.id.progressBarLoading).setVisibility(View.GONE);
 	}
 
 	private void changeTimer() {
-		if (!mMainPageInited)
+		if (!mViewVariablesInited)
 			return;
 		final AlertDialog.Builder seekDialog = new AlertDialog.Builder(mActivity);
 		View seekView = View.inflate(mActivity, R.layout.layout_timer_chooser, null);
