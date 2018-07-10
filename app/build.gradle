@@ -68,10 +68,10 @@ dependencies {
     playImplementation 'com.google.android.gms:play-services-cast:15.0.1'
     playImplementation 'com.google.android.gms:play-services-cast-framework:15.0.1'
 
-    // 腾讯push和信鸽服务
-    compile 'com.tencent.tac:tac-core:1.1.1'
-    compile 'com.tencent.tac:tac-crash:1.1.1'
-    compile 'com.tencent.tac:tac-messaging:1.1.1'
+    // 腾讯push 和 信鸽  但这个信鸽没卵用，两个月前在语音指令app上成功过，后来再也不行了
+    compile 'com.tencent.tac:tac-core:1.2.+'
+    compile 'com.tencent.tac:tac-crash:1.2.+'
+    compile 'com.tencent.tac:tac-messaging:1.2.+'
 }
 
 
@@ -154,3 +154,5 @@ configurations.all {
         }
     }
 }
+
+apply plugin: 'com.tencent.tac.services'

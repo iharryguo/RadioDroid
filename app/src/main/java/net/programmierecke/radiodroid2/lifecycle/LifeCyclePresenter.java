@@ -116,7 +116,7 @@ public class LifeCyclePresenter implements ILifeCyclePresenter {
 				public void run() {
 					showMainPage(savedInstanceState);
 				}
-			}, 300);
+			}, 500);
 		}
 		CastHandler.onCreate(mActivity);
 	}
